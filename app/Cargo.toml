@@ -1,0 +1,7 @@
+[package]
+name = "simworld-app"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+simworld-core = { workspace = true }
