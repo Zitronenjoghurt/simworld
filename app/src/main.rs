@@ -1,9 +1,15 @@
-use simworld_core::pop::PopSpawnEvent;
-use simworld_core::world::World;
+use egui_winit::winit::event_loop::{ControlFlow, EventLoop};
 
-fn main() {
-    let mut world = World::new(200, 200);
-    world.events.emit(PopSpawnEvent::new([0.0, 0.0].into()));
-    world.tick();
-    world.tick();
+mod app;
+mod gfx;
+mod ui;
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let event_loop = EventLoop::new()?;
+    event_loop.set_control_flow(ControlFlow::Poll);
+
+    let mut app = app::App::new();
+    event_loop.run_app(&mut app)?;
+
+    Ok(())
 }

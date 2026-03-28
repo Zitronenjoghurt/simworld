@@ -1,4 +1,4 @@
-use crate::events::Events;
+use crate::game::events::Events;
 use glam::Vec2;
 use slotmap::{new_key_type, SlotMap};
 

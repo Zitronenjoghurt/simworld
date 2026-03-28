@@ -5,3 +5,9 @@ edition = "2024"
 
 [dependencies]
 simworld-core = { workspace = true }
+anyhow = "1.0.102"
+egui = "0.34.1"
+egui-wgpu = "0.34.1"
+egui-winit = "0.34.1"
+pollster = "0.4.0"
+wgpu-profiler = "0.27.0"

@@ -1,6 +1,6 @@
-use crate::events::Events;
-use crate::map::Map;
-use crate::pop::Pops;
+use crate::game::events::Events;
+use crate::game::map::Map;
+use crate::game::pop::Pops;
 
 pub struct World {
     pub events: Events,

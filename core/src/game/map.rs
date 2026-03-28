@@ -1,4 +1,4 @@
-use crate::map::terrain::Terrain;
+use crate::game::map::terrain::Terrain;
 use grid::Grid;
 
 mod terrain;
