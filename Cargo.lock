@@ -2135,7 +2135,9 @@ dependencies = [
  "bytemuck",
  "glam",
  "grid",
+ "image",
  "slotmap",
+ "thiserror 2.0.18",
  "triple_buffer",
  "wgpu",
 ]

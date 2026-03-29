@@ -1,7 +1,7 @@
 #[derive(Default, Clone)]
-pub struct ViewState {}
+pub struct VisualState {}
 
-impl ViewState {
+impl VisualState {
     pub fn new() -> Self {
         Self::default()
     }

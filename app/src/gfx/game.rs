@@ -2,21 +2,21 @@ use egui_wgpu::wgpu;
 use egui_winit::winit;
 use simworld_core::math::size::Size;
 use simworld_core::renderer::{RenderStage, Renderer};
-use simworld_core::world::view::ViewState;
+use simworld_core::visuals::state::VisualState;
 
 pub struct Game {
     renderer: Renderer,
 }
 
 impl Game {
-    pub fn new(device: &wgpu::Device) -> Self {
-        Self {
-            renderer: Renderer::new(device),
-        }
+    pub fn new(device: &wgpu::Device) -> anyhow::Result<Self> {
+        Ok(Self {
+            renderer: Renderer::new(device)?,
+        })
     }
 
-    pub fn prepare(&mut self, view_state: &ViewState, device: &wgpu::Device, queue: &wgpu::Queue) {
-        self.renderer.prepare(view_state, device, queue);
+    pub fn prepare(&mut self, visuals: &VisualState, device: &wgpu::Device, queue: &wgpu::Queue) {
+        self.renderer.prepare(visuals, device, queue);
     }
 
     pub fn render(&mut self, view: &wgpu::TextureView, encoder: &mut wgpu::CommandEncoder) {

@@ -1,8 +1,8 @@
-use crate::world::view::ViewState;
+use crate::visuals::state::VisualState;
 
 #[derive(Default, Clone)]
 pub struct SimState {
-    pub view: ViewState,
+    pub visuals: VisualState,
 }
 
 impl SimState {

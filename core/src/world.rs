@@ -5,7 +5,6 @@ use pop::Pops;
 mod events;
 mod map;
 pub mod pop;
-pub mod view;
 
 pub struct World {
     pub events: Events,

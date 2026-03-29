@@ -2,7 +2,7 @@ use crate::math::point::Point;
 use crate::math::rect::Rect;
 use crate::math::size::Size;
 use crate::renderer::RenderStage;
-use crate::world::view::ViewState;
+use crate::visuals::state::VisualState;
 use bytemuck::{Pod, Zeroable};
 
 pub struct CameraStage {
@@ -38,7 +38,7 @@ impl CameraStage {
 }
 
 impl RenderStage for CameraStage {
-    fn prepare(&mut self, _view: &ViewState, _device: &wgpu::Device, queue: &wgpu::Queue) {
+    fn prepare(&mut self, _visuals: &VisualState, _device: &wgpu::Device, queue: &wgpu::Queue) {
         let uniform = CameraUniform::from(&self.camera);
         queue.write_buffer(&self.buffer, 0, bytemuck::bytes_of(&uniform));
     }

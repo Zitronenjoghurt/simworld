@@ -1,19 +1,25 @@
+use crate::error::CoreResult;
 use crate::math::point::Point;
 use crate::math::size::Size;
-use crate::world::view::ViewState;
+use crate::visuals::palette::Palette;
+use crate::visuals::state::VisualState;
 use wgpu::{Device, Queue, RenderPass};
 
+mod atlas;
 mod camera;
+mod palette;
 
 pub struct Renderer {
     camera: camera::CameraStage,
+    palette: palette::PaletteStage,
 }
 
 impl Renderer {
-    pub fn new(device: &Device) -> Self {
-        Self {
+    pub fn new(device: &Device) -> CoreResult<Self> {
+        Ok(Self {
             camera: camera::CameraStage::new(device),
-        }
+            palette: palette::PaletteStage::new(Palette::default(), device),
+        })
     }
 
     pub fn resize_screen(&mut self, size: Size<f32>) {
@@ -30,8 +36,8 @@ impl Renderer {
 }
 
 impl RenderStage for Renderer {
-    fn prepare(&mut self, view: &ViewState, device: &Device, queue: &Queue) {
-        self.camera.prepare(view, device, queue);
+    fn prepare(&mut self, visuals: &VisualState, device: &Device, queue: &Queue) {
+        self.camera.prepare(visuals, device, queue);
     }
 
     fn render<'rp>(&'rp self, pass: &mut RenderPass<'rp>) {
@@ -40,7 +46,7 @@ impl RenderStage for Renderer {
 }
 
 pub trait RenderStage {
-    fn prepare(&mut self, view: &ViewState, device: &wgpu::Device, queue: &wgpu::Queue);
+    fn prepare(&mut self, view: &VisualState, device: &wgpu::Device, queue: &wgpu::Queue);
 
     fn render<'rp>(&'rp self, pass: &mut wgpu::RenderPass<'rp>);
 }

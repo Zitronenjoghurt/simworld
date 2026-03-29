@@ -5,7 +5,7 @@ use crate::gfx::wgpu::Wgpu;
 use egui_winit::winit;
 use egui_winit::winit::dpi::PhysicalSize;
 use egui_winit::winit::window::Window;
-use simworld_core::world::view::ViewState;
+use simworld_core::visuals::state::VisualState;
 use std::sync::Arc;
 
 mod egui;
@@ -24,7 +24,7 @@ impl Gfx<'_> {
     pub fn new(window: Arc<Window>) -> anyhow::Result<Self> {
         let wgpu = Wgpu::setup(window.clone())?;
         let egui = Egui::setup(&wgpu);
-        let game = Game::new(wgpu.device());
+        let game = Game::new(wgpu.device())?;
         let performance = GfxPerformance::new(wgpu.device())?;
 
         let gfx = Gfx {
@@ -37,9 +37,9 @@ impl Gfx<'_> {
         Ok(gfx)
     }
 
-    pub fn prepare(&mut self, view_state: &ViewState) {
+    pub fn prepare(&mut self, visuals: &VisualState) {
         self.game
-            .prepare(view_state, self.wgpu.device(), self.wgpu.queue());
+            .prepare(visuals, self.wgpu.device(), self.wgpu.queue());
     }
 
     pub fn render(&mut self) -> anyhow::Result<()> {

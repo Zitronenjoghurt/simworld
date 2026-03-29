@@ -49,7 +49,7 @@ impl ApplicationHandler for App<'_> {
         let sim_state = self.sim.latest_state();
 
         if let Some(gfx) = &mut self.gfx {
-            gfx.prepare(&sim_state.view);
+            gfx.prepare(&sim_state.visuals);
             gfx.request_redraw();
         }
     }
