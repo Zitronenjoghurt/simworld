@@ -1,6 +1,11 @@
-use crate::game::events::Events;
-use crate::game::map::Map;
-use crate::game::pop::Pops;
+use events::Events;
+use map::Map;
+use pop::Pops;
+
+mod events;
+mod map;
+pub mod pop;
+pub mod view;
 
 pub struct World {
     pub events: Events,
@@ -18,7 +23,7 @@ impl World {
     }
 
     pub fn tick(&mut self) {
-        self.events.swap();
+        self.events.tick();
 
         self.pops.update(&mut self.events);
     }

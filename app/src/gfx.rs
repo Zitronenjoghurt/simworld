@@ -1,18 +1,22 @@
 use crate::gfx::egui::Egui;
+use crate::gfx::game::Game;
 use crate::gfx::performance::GfxPerformance;
 use crate::gfx::wgpu::Wgpu;
 use egui_winit::winit;
 use egui_winit::winit::dpi::PhysicalSize;
 use egui_winit::winit::window::Window;
+use simworld_core::world::view::ViewState;
 use std::sync::Arc;
 
 mod egui;
+mod game;
 mod performance;
 mod wgpu;
 
 pub struct Gfx<'a> {
     wgpu: Wgpu<'a>,
     egui: Egui,
+    game: Game,
     performance: GfxPerformance,
 }
 
@@ -20,15 +24,22 @@ impl Gfx<'_> {
     pub fn new(window: Arc<Window>) -> anyhow::Result<Self> {
         let wgpu = Wgpu::setup(window.clone())?;
         let egui = Egui::setup(&wgpu);
+        let game = Game::new(wgpu.device());
         let performance = GfxPerformance::new(wgpu.device())?;
 
         let gfx = Gfx {
             wgpu,
             egui,
+            game,
             performance,
         };
 
         Ok(gfx)
+    }
+
+    pub fn prepare(&mut self, view_state: &ViewState) {
+        self.game
+            .prepare(view_state, self.wgpu.device(), self.wgpu.queue());
     }
 
     pub fn render(&mut self) -> anyhow::Result<()> {
@@ -45,9 +56,8 @@ impl Gfx<'_> {
             let scope = self
                 .performance
                 .get_scope("Full Render Frame", &mut encoder);
-            {
-                self.egui.render(&self.wgpu, &view, scope.recorder);
-            }
+            self.game.render(&view, scope.recorder);
+            self.egui.render(&self.wgpu, &view, scope.recorder);
         }
 
         self.performance.resolve_queries(&mut encoder);
@@ -66,6 +76,7 @@ impl Gfx<'_> {
 
     pub fn resize(&mut self, size: PhysicalSize<u32>) {
         self.wgpu.resize(size);
+        self.game.resize(size);
     }
 
     pub fn on_window_event(&mut self, event: &winit::event::WindowEvent) -> bool {

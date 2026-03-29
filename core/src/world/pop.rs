@@ -1,14 +1,17 @@
-use crate::game::events::Events;
-use glam::Vec2;
+use crate::world::events::Events;
+use crate::world::pop::events::PopSpawnEvent;
+use glam::DVec2;
 use slotmap::{new_key_type, SlotMap};
 
-pub struct Pop {
-    pub id: PopId,
-    pub pos: Vec2,
-}
+mod events;
 
 new_key_type! {
     pub struct PopId;
+}
+
+pub struct Pop {
+    pub id: PopId,
+    pub pos: DVec2,
 }
 
 #[derive(Default)]
@@ -26,18 +29,10 @@ impl Pops {
     }
 
     fn process_events(&mut self, events: &mut Events) {
-        for ev in events.read::<PopSpawnEvent>() {
+        let (reader, _) = events.split();
+
+        for ev in reader.read::<PopSpawnEvent>() {
             let _id = self.map.insert_with_key(|id| Pop { id, pos: ev.pos });
         }
-    }
-}
-
-pub struct PopSpawnEvent {
-    pub pos: Vec2,
-}
-
-impl PopSpawnEvent {
-    pub fn new(pos: Vec2) -> Self {
-        Self { pos }
     }
 }

@@ -1,5 +1,5 @@
 use crate::gfx::wgpu::Wgpu;
-use egui::{CentralPanel, ClippedPrimitive};
+use egui::{ClippedPrimitive, Panel};
 use egui_wgpu::{wgpu, RendererOptions};
 use egui_winit::winit;
 
@@ -31,10 +31,9 @@ impl Egui {
 
         let input = self.state.take_egui_input(wgpu.window());
         let output = self.state.egui_ctx().run_ui(input, |ctx| {
-            CentralPanel::default().show_inside(ctx, |ui| {
-                ui.heading("Hello, world!");
+            Panel::top("top_pannel").show_inside(ctx, |ui| {
+                ui.heading("Welcome to SimWorld!");
             });
-            //self.ui.update(ctx);
         });
 
         self.textures.append(output.textures_delta);
