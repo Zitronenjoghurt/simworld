@@ -14,6 +14,14 @@ impl SpriteSheet {
         self.sprites.get(index)
     }
 
+    pub fn sprites(&self) -> &[Sprite] {
+        &self.sprites
+    }
+
+    pub fn into_sprites(self) -> Vec<Sprite> {
+        self.sprites
+    }
+
     #[cfg(feature = "image")]
     pub fn from_png(bytes: &[u8], palette: &Palette) -> CoreResult<Self> {
         let img = image::load_from_memory(bytes)?.to_rgba8();

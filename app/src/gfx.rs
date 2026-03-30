@@ -1,9 +1,11 @@
+use crate::app::controls::AppUiControls;
 use crate::gfx::egui::Egui;
 use crate::gfx::game::Game;
 use crate::gfx::performance::GfxPerformance;
 use crate::gfx::wgpu::Wgpu;
 use egui_winit::winit;
 use egui_winit::winit::dpi::PhysicalSize;
+use egui_winit::winit::event::MouseScrollDelta;
 use egui_winit::winit::window::Window;
 use simworld_core::visuals::state::VisualState;
 use std::sync::Arc;
@@ -24,7 +26,7 @@ impl Gfx<'_> {
     pub fn new(window: Arc<Window>) -> anyhow::Result<Self> {
         let wgpu = Wgpu::setup(window.clone())?;
         let egui = Egui::setup(&wgpu);
-        let game = Game::new(wgpu.device())?;
+        let game = Game::new(wgpu.device(), wgpu.surface_format())?;
         let performance = GfxPerformance::new(wgpu.device())?;
 
         let gfx = Gfx {
@@ -79,15 +81,47 @@ impl Gfx<'_> {
         self.game.resize(size);
     }
 
-    pub fn on_window_event(&mut self, event: &winit::event::WindowEvent) -> bool {
-        if self.egui.on_window_event(self.wgpu.window(), event) {
-            return true;
-        };
+    pub fn on_window_event(
+        &mut self,
+        event: &winit::event::WindowEvent,
+        controls: &mut AppUiControls,
+    ) -> bool {
+        self.egui.on_window_event(self.wgpu.window(), event);
+
+        match event {
+            winit::event::WindowEvent::CursorMoved { position, .. } => {
+                if controls.middle_mouse_button {
+                    let dx = position.x - controls.mouse_x;
+                    let dy = position.y - controls.mouse_y;
+                    self.game.pan_camera(dx, dy);
+                }
+                controls.mouse_pos(*position);
+            }
+            winit::event::WindowEvent::MouseWheel { delta, .. } => {
+                let scroll_y = match delta {
+                    MouseScrollDelta::LineDelta(_, y) => *y,
+                    MouseScrollDelta::PixelDelta(pos) => (pos.y / 50.0) as f32,
+                };
+
+                if scroll_y != 0.0 {
+                    self.game
+                        .zoom_camera(scroll_y as f64, controls.mouse_x, controls.mouse_y);
+                }
+            }
+            winit::event::WindowEvent::MouseInput { state, button, .. } => {
+                controls.mouse_button(*state, *button);
+            }
+            _ => {}
+        }
 
         false
     }
 
     pub fn set_egui_scale_factor(&mut self, scale_factor: f32) {
         self.egui.set_scale_factor(scale_factor);
+    }
+
+    pub fn performance(&self) -> &GfxPerformance {
+        &self.performance
     }
 }

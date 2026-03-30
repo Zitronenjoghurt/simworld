@@ -18,6 +18,18 @@ impl PaletteIndex {
     }
 }
 
+impl From<PaletteIndex> for u8 {
+    fn from(index: PaletteIndex) -> Self {
+        index.0
+    }
+}
+
+impl From<u8> for PaletteIndex {
+    fn from(index: u8) -> Self {
+        Self(index)
+    }
+}
+
 #[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd)]
 pub struct Palette([RGBA; 32]);
 

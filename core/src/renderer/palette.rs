@@ -1,6 +1,4 @@
-use crate::renderer::RenderStage;
 use crate::visuals::palette::Palette;
-use crate::visuals::state::VisualState;
 
 pub struct PaletteStage {
     bind_group: wgpu::BindGroup,
@@ -24,17 +22,21 @@ impl PaletteStage {
             texture,
         }
     }
-}
 
-impl RenderStage for PaletteStage {
-    fn prepare(&mut self, _view: &VisualState, _device: &wgpu::Device, queue: &wgpu::Queue) {
+    pub fn update(&mut self, queue: &wgpu::Queue) {
         if self.palette_dirty {
             write_texture(&self.palette, &self.texture, queue);
             self.palette_dirty = false;
         }
     }
 
-    fn render<'rp>(&'rp self, _pass: &mut wgpu::RenderPass<'rp>) {}
+    pub fn bind_group(&self) -> &wgpu::BindGroup {
+        &self.bind_group
+    }
+
+    pub fn bind_group_layout(&self) -> &wgpu::BindGroupLayout {
+        &self.bind_group_layout
+    }
 }
 
 fn texture(device: &wgpu::Device) -> wgpu::Texture {

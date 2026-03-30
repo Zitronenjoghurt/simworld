@@ -1,4 +1,6 @@
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Ord, PartialOrd)]
+use strum_macros::FromRepr;
+
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Ord, PartialOrd, Hash, FromRepr)]
 #[repr(usize)]
 pub enum TerrainSpriteId {
     Grass = 0,

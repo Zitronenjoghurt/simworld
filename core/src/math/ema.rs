@@ -1,4 +1,4 @@
-use std::fmt::Debug;
+use std::fmt::{Debug, Display};
 use std::time;
 use std::time::Duration;
 
@@ -142,5 +142,17 @@ impl EmaTimer {
 
     pub fn display_budget(&self) -> String {
         format!("{:.01}%", self.budget() * 100.0)
+    }
+}
+
+impl Display for EmaTimer {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}/{} ({})",
+            self.display_average_secs(),
+            self.display_updates_per_sec(),
+            self.display_budget()
+        )
     }
 }

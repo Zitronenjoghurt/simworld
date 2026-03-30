@@ -1,7 +1,8 @@
 use crate::gfx::wgpu::Wgpu;
-use egui::{ClippedPrimitive, Panel};
+use egui::{ClippedPrimitive, FontDefinitions, Panel};
 use egui_wgpu::{wgpu, RendererOptions};
 use egui_winit::winit;
+use std::sync::Arc;
 
 pub struct Egui {
     state: egui_winit::State,
@@ -108,17 +109,17 @@ impl Egui {
 fn context() -> egui::Context {
     let egui_ctx = egui::Context::default();
 
-    //let mut fonts = FontDefinitions::default();
-    //fonts.font_data.insert(
-    //    "phosphor".into(),
-    //    Arc::from(egui::FontData::from_static(
-    //        egui_phosphor::Variant::Regular.font_bytes(),
-    //    )),
-    //);
-    //if let Some(font_keys) = fonts.families.get_mut(&egui::FontFamily::Proportional) {
-    //    font_keys.insert(1, "phosphor".into());
-    //}
-    //egui_ctx.set_fonts(fonts);
+    let mut fonts = FontDefinitions::default();
+    fonts.font_data.insert(
+        "phosphor".into(),
+        Arc::from(egui::FontData::from_static(
+            egui_phosphor::Variant::Regular.font_bytes(),
+        )),
+    );
+    if let Some(font_keys) = fonts.families.get_mut(&egui::FontFamily::Proportional) {
+        font_keys.insert(1, "phosphor".into());
+    }
+    egui_ctx.set_fonts(fonts);
 
     egui_ctx
 }

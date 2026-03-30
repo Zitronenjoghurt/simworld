@@ -1,12 +1,11 @@
 use crate::math::point::Point;
 use crate::math::rect::Rect;
 use crate::math::size::Size;
-use crate::renderer::RenderStage;
-use crate::visuals::state::VisualState;
 use bytemuck::{Pod, Zeroable};
 
 pub struct CameraStage {
     camera: Camera,
+    dirty: bool,
     buffer: wgpu::Buffer,
     bind_group: wgpu::BindGroup,
     bind_group_layout: wgpu::BindGroupLayout,
@@ -18,32 +17,43 @@ impl CameraStage {
         let (bind_group, bind_group_layout) = bind_group(device, &buffer);
         Self {
             camera: Camera::default(),
+            dirty: true,
             buffer,
             bind_group,
             bind_group_layout,
         }
     }
 
+    pub fn update(&mut self, queue: &wgpu::Queue) {
+        if self.dirty {
+            let uniform = CameraUniform::from(&self.camera);
+            queue.write_buffer(&self.buffer, 0, bytemuck::bytes_of(&uniform));
+            self.dirty = false;
+        }
+    }
+
     pub fn resize(&mut self, size: Size<f32>) {
         self.camera.resize(size);
+        self.dirty = true;
     }
 
     pub fn pan(&mut self, screen_delta: (f64, f64)) {
         self.camera.pan(screen_delta);
+        self.dirty = true;
     }
 
     pub fn zoom(&mut self, scroll_delta: f64, mouse_pos: Point<f64>) {
         self.camera.zoom(scroll_delta, mouse_pos);
-    }
-}
-
-impl RenderStage for CameraStage {
-    fn prepare(&mut self, _visuals: &VisualState, _device: &wgpu::Device, queue: &wgpu::Queue) {
-        let uniform = CameraUniform::from(&self.camera);
-        queue.write_buffer(&self.buffer, 0, bytemuck::bytes_of(&uniform));
+        self.dirty = true;
     }
 
-    fn render<'rp>(&'rp self, _pass: &mut wgpu::RenderPass<'rp>) {}
+    pub fn bind_group(&self) -> &wgpu::BindGroup {
+        &self.bind_group
+    }
+
+    pub fn bind_group_layout(&self) -> &wgpu::BindGroupLayout {
+        &self.bind_group_layout
+    }
 }
 
 pub struct Camera {
@@ -68,8 +78,8 @@ impl Camera {
     }
 
     pub fn pan(&mut self, screen_delta: (f64, f64)) {
-        self.center.x += screen_delta.0 as f32 / self.zoom;
-        self.center.y += screen_delta.1 as f32 / self.zoom;
+        self.center.x -= screen_delta.0 as f32 / self.zoom;
+        self.center.y -= screen_delta.1 as f32 / self.zoom;
     }
 
     pub fn zoom(&mut self, scroll_delta: f64, mouse_pos: Point<f64>) {

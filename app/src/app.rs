@@ -7,9 +7,12 @@ use simworld_core::sim::Sim;
 use simworld_core::world::World;
 use std::sync::Arc;
 
+pub mod controls;
+
 pub struct App<'a> {
     pub gfx: Option<Gfx<'a>>,
     pub sim: Sim,
+    pub controls: controls::AppUiControls,
 }
 
 impl App<'_> {
@@ -17,6 +20,7 @@ impl App<'_> {
         Self {
             gfx: None,
             sim: Sim::new(World::new(200, 200)),
+            controls: controls::AppUiControls::default(),
         }
     }
 }
@@ -35,7 +39,7 @@ impl ApplicationHandler for App<'_> {
         event: WindowEvent,
     ) {
         let Some(gfx) = &mut self.gfx else { return };
-        let _consumed = gfx.on_window_event(&event);
+        let _consumed = gfx.on_window_event(&event, &mut self.controls);
 
         match event {
             WindowEvent::CloseRequested => event_loop.exit(),
