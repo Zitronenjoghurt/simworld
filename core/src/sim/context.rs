@@ -17,7 +17,7 @@ impl SimContext {
             self.world.tick();
             self.world.draw(&mut state.visuals);
 
-            state.performance.update.stop();
+            state.performance.update.stop(30);
             self.state_writer.publish();
 
             std::thread::sleep(std::time::Duration::from_millis(100));

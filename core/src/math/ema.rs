@@ -102,15 +102,15 @@ impl EmaTimer {
         self.start = time::Instant::now();
     }
 
-    pub fn stop(&mut self) {
+    pub fn stop(&mut self, periods: usize) {
         let now = time::Instant::now();
         let elapsed = (now - self.start).as_secs_f32();
-        self.ema_secs.update(elapsed, 1200);
+        self.ema_secs.update(elapsed, periods);
 
         if let Some(last) = self.last_stop {
             let interval = (now - last).as_secs_f32();
             if interval > 0.0 {
-                self.ema_interval.update(interval, 1200);
+                self.ema_interval.update(interval, periods);
             }
         }
         self.last_stop = Some(now);

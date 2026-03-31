@@ -28,7 +28,7 @@ impl World {
         self.pops.update(&mut self.events);
     }
 
-    pub fn draw(&self, visuals: &mut VisualState) {
+    pub fn draw(&mut self, visuals: &mut VisualState) {
         self.map.draw(visuals);
     }
 }

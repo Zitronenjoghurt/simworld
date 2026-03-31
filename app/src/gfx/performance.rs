@@ -46,7 +46,7 @@ impl GfxPerformance {
             self.gpu.update(duration, 100);
         }
 
-        self.cpu.stop();
+        self.cpu.stop(1800);
 
         Ok(())
     }

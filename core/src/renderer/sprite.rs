@@ -36,7 +36,6 @@ impl SpriteStage {
     pub fn prepare(&mut self, visuals: &VisualState, atlas: &AtlasStage, queue: &wgpu::Queue) {
         let instances: Vec<SpriteInstance> = visuals
             .sprites()
-            .iter()
             .filter_map(|pos| {
                 let idx = atlas.atlas_index(pos.sprite_id)?;
                 Some(SpriteInstance {
