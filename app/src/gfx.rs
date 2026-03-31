@@ -78,7 +78,7 @@ impl Gfx<'_> {
 
     pub fn resize(&mut self, size: PhysicalSize<u32>) {
         self.wgpu.resize(size);
-        self.game.resize(size);
+        self.game.resize(self.wgpu.device(), size);
     }
 
     pub fn on_window_event(

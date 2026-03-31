@@ -32,14 +32,22 @@ impl Game {
                     store: wgpu::StoreOp::Store,
                 },
             })],
+            depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
+                view: self.renderer.depth_view(),
+                depth_ops: Some(wgpu::Operations {
+                    load: wgpu::LoadOp::Clear(1.0),
+                    store: wgpu::StoreOp::Discard,
+                }),
+                stencil_ops: None,
+            }),
             ..Default::default()
         });
         self.renderer.render(&mut rpass);
     }
 
-    pub fn resize(&mut self, size: winit::dpi::PhysicalSize<u32>) {
+    pub fn resize(&mut self, device: &wgpu::Device, size: winit::dpi::PhysicalSize<u32>) {
         self.renderer
-            .resize_screen(Size::new(size.width as f32, size.height as f32));
+            .resize_screen(device, Size::new(size.width as f32, size.height as f32));
     }
 
     pub fn pan_camera(&mut self, dx: f64, dy: f64) {

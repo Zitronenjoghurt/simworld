@@ -8,20 +8,26 @@ pub struct VisualState {
 
 impl Default for VisualState {
     fn default() -> Self {
-        let mut sprites = Vec::new();
-
-        for x in 0..=100 {
-            for y in 0..=100 {
-                let sprite_id = TerrainSpriteId::from_repr((x * y) % 4).unwrap();
-                sprites.push(SpritePos {
-                    x: (x * 8) as f32,
-                    y: (y * 8) as f32,
-                    z: 0.0,
-                    sprite_id: SpriteId::Terrain(sprite_id),
-                });
-            }
-        }
-
+        let sprites = vec![
+            SpritePos {
+                x: 2.0,
+                y: 2.0,
+                z: 0.0,
+                sprite_id: SpriteId::Terrain(TerrainSpriteId::Water),
+            },
+            SpritePos {
+                x: 1.0,
+                y: 1.0,
+                z: 1.0,
+                sprite_id: SpriteId::Terrain(TerrainSpriteId::Dirt),
+            },
+            SpritePos {
+                x: 0.0,
+                y: 0.0,
+                z: 0.0,
+                sprite_id: SpriteId::Terrain(TerrainSpriteId::Grass),
+            },
+        ];
         Self { sprites }
     }
 }

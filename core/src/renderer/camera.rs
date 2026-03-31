@@ -131,11 +131,20 @@ impl CameraUniform {
         let w_inv = 1.0 / (right - left);
         let h_inv = 1.0 / (top - bottom);
 
+        let near = 100.0_f32;
+        let far = -100.0_f32;
+        let z_inv = 1.0 / (far - near);
+
         let view_proj = [
             [2.0 * w_inv, 0.0, 0.0, 0.0],
             [0.0, 2.0 * h_inv, 0.0, 0.0],
-            [0.0, 0.0, 1.0, 0.0],
-            [-(right + left) * w_inv, -(top + bottom) * h_inv, 0.0, 1.0],
+            [0.0, 0.0, z_inv, 0.0],
+            [
+                -(right + left) * w_inv,
+                -(top + bottom) * h_inv,
+                -near * z_inv,
+                1.0,
+            ],
         ];
 
         Self {
