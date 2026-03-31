@@ -19,7 +19,7 @@ impl App<'_> {
     pub fn new() -> Self {
         Self {
             gfx: None,
-            sim: Sim::new(World::new(200, 200)),
+            sim: Sim::new(World::new(500, 500)),
             controls: controls::AppUiControls::default(),
         }
     }
@@ -51,6 +51,7 @@ impl ApplicationHandler for App<'_> {
 
     fn about_to_wait(&mut self, _event_loop: &ActiveEventLoop) {
         let sim_state = self.sim.latest_state();
+        println!("{}", sim_state.performance.update);
 
         if let Some(gfx) = &mut self.gfx {
             gfx.prepare(&sim_state.visuals);

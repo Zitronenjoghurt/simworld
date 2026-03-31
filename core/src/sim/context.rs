@@ -9,6 +9,17 @@ pub struct SimContext {
 impl SimContext {
     pub fn run(mut self) {
         loop {
+            let state = self.state_writer.input_buffer_mut();
+
+            state.performance.update.start();
+
+            state.visuals.clear();
+            self.world.tick();
+            self.world.draw(&mut state.visuals);
+
+            state.performance.update.stop();
+            self.state_writer.publish();
+
             std::thread::sleep(std::time::Duration::from_millis(100));
         }
     }

@@ -2,6 +2,7 @@ use crate::sim::state::SimState;
 use crate::world::World;
 
 mod context;
+mod performance;
 mod state;
 
 pub struct Sim {

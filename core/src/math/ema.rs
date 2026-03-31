@@ -74,6 +74,7 @@ impl EMAValue for u32 {
     }
 }
 
+#[derive(Debug, Copy, Clone)]
 pub struct EmaTimer {
     start: time::Instant,
     last_stop: Option<time::Instant>,

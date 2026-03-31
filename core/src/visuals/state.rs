@@ -1,35 +1,8 @@
 use crate::visuals::sprite::SpriteId;
-use crate::visuals::sprite_sheet::terrain::TerrainSpriteId;
 
-#[derive(Clone)]
+#[derive(Default, Clone)]
 pub struct VisualState {
     sprites: Vec<SpritePos>,
-}
-
-impl Default for VisualState {
-    fn default() -> Self {
-        let sprites = vec![
-            SpritePos {
-                x: 2.0,
-                y: 2.0,
-                z: 0.0,
-                sprite_id: SpriteId::Terrain(TerrainSpriteId::Water),
-            },
-            SpritePos {
-                x: 1.0,
-                y: 1.0,
-                z: 1.0,
-                sprite_id: SpriteId::Terrain(TerrainSpriteId::Dirt),
-            },
-            SpritePos {
-                x: 0.0,
-                y: 0.0,
-                z: 0.0,
-                sprite_id: SpriteId::Terrain(TerrainSpriteId::Grass),
-            },
-        ];
-        Self { sprites }
-    }
 }
 
 impl VisualState {
@@ -39,6 +12,14 @@ impl VisualState {
 
     pub fn sprites(&self) -> &[SpritePos] {
         &self.sprites
+    }
+
+    pub fn clear(&mut self) {
+        self.sprites.clear();
+    }
+
+    pub fn add(&mut self, x: f32, y: f32, z: f32, sprite_id: SpriteId) {
+        self.sprites.push(SpritePos { x, y, z, sprite_id });
     }
 }
 

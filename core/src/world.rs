@@ -1,3 +1,4 @@
+use crate::visuals::state::VisualState;
 use events::Events;
 use map::Map;
 use pop::Pops;
@@ -25,5 +26,9 @@ impl World {
         self.events.tick();
 
         self.pops.update(&mut self.events);
+    }
+
+    pub fn draw(&self, visuals: &mut VisualState) {
+        self.map.draw(visuals);
     }
 }
