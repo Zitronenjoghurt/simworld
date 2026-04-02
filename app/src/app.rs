@@ -1,4 +1,5 @@
 use crate::gfx::Gfx;
+use crate::ui::{AppUi, UiContext};
 use egui_winit::winit::application::ApplicationHandler;
 use egui_winit::winit::event::WindowEvent;
 use egui_winit::winit::event_loop::ActiveEventLoop;
@@ -8,12 +9,10 @@ use simworld_core::sim::Sim;
 use simworld_core::world::World;
 use std::sync::Arc;
 
-pub mod controls;
-
 pub struct App<'a> {
     pub gfx: Option<Gfx<'a>>,
     pub sim: Sim,
-    pub controls: controls::AppUiControls,
+    pub ui: AppUi,
 }
 
 impl App<'_> {
@@ -21,7 +20,7 @@ impl App<'_> {
         Self {
             gfx: None,
             sim: Sim::new(SimConfig::default(), World::new(500, 500)),
-            controls: controls::AppUiControls::default(),
+            ui: AppUi::default(),
         }
     }
 }
@@ -40,22 +39,29 @@ impl ApplicationHandler for App<'_> {
         event: WindowEvent,
     ) {
         let Some(gfx) = &mut self.gfx else { return };
-        let _consumed = gfx.on_window_event(&event, &mut self.controls);
+        let _consumed = gfx.on_window_event(&event, &mut self.ui.controls);
 
         match event {
             WindowEvent::CloseRequested => event_loop.exit(),
-            WindowEvent::RedrawRequested => gfx.render().unwrap(),
+            WindowEvent::RedrawRequested => {
+                let sim_state = self.sim.latest_state();
+                gfx.prepare(&sim_state.visuals);
+
+                let mut ui_ctx = UiContext {
+                    gfx_cpu: gfx.performance().cpu,
+                    gfx_gpu: gfx.performance().gpu,
+                    sim_performance: &sim_state.performance,
+                };
+
+                gfx.render(|ui| self.ui.show(ui, &mut ui_ctx)).unwrap();
+            }
             WindowEvent::Resized(size) => gfx.resize(size),
             _ => {}
         }
     }
 
     fn about_to_wait(&mut self, _event_loop: &ActiveEventLoop) {
-        let sim_state = self.sim.latest_state();
-        println!("{}", sim_state.performance.update);
-
         if let Some(gfx) = &mut self.gfx {
-            gfx.prepare(&sim_state.visuals);
             gfx.request_redraw();
         }
     }

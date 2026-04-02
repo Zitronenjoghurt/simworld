@@ -1,5 +1,5 @@
 use crate::gfx::wgpu::Wgpu;
-use egui::{ClippedPrimitive, FontDefinitions, Panel};
+use egui::{ClippedPrimitive, FontDefinitions, Ui};
 use egui_wgpu::{wgpu, RendererOptions};
 use egui_winit::winit;
 use std::sync::Arc;
@@ -25,17 +25,13 @@ impl Egui {
         }
     }
 
-    fn prepare_ui(&mut self, wgpu: &Wgpu) -> Vec<ClippedPrimitive> {
+    fn prepare_ui(&mut self, wgpu: &Wgpu, build: impl FnMut(&mut Ui)) -> Vec<ClippedPrimitive> {
         let size = wgpu.window().inner_size();
         self.screen.size_in_pixels = [size.width, size.height];
         self.screen.pixels_per_point = self.state.egui_ctx().pixels_per_point();
 
         let input = self.state.take_egui_input(wgpu.window());
-        let output = self.state.egui_ctx().run_ui(input, |ctx| {
-            Panel::top("top_pannel").show_inside(ctx, |ui| {
-                ui.heading("Welcome to SimWorld!");
-            });
-        });
+        let output = self.state.egui_ctx().run_ui(input, build);
 
         self.textures.append(output.textures_delta);
         self.state
@@ -50,8 +46,9 @@ impl Egui {
         wgpu: &Wgpu,
         view: &wgpu::TextureView,
         encoder: &mut wgpu::CommandEncoder,
+        build_ui: impl FnMut(&mut Ui),
     ) {
-        let paint_jobs = self.prepare_ui(wgpu);
+        let paint_jobs = self.prepare_ui(wgpu, build_ui);
 
         for (id, delta) in &self.textures.set {
             self.renderer

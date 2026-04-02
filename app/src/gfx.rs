@@ -1,8 +1,9 @@
-use crate::app::controls::AppUiControls;
 use crate::gfx::egui::Egui;
 use crate::gfx::game::Game;
 use crate::gfx::performance::GfxPerformance;
 use crate::gfx::wgpu::Wgpu;
+use crate::ui::controls::AppUiControls;
+use ::egui::Ui;
 use egui_winit::winit;
 use egui_winit::winit::dpi::PhysicalSize;
 use egui_winit::winit::event::MouseScrollDelta;
@@ -12,7 +13,7 @@ use std::sync::Arc;
 
 mod egui;
 mod game;
-mod performance;
+pub mod performance;
 mod wgpu;
 
 pub struct Gfx<'a> {
@@ -44,7 +45,7 @@ impl Gfx<'_> {
             .prepare(visuals, self.wgpu.device(), self.wgpu.queue());
     }
 
-    pub fn render(&mut self) -> anyhow::Result<()> {
+    pub fn render(&mut self, build_ui: impl FnMut(&mut Ui)) -> anyhow::Result<()> {
         self.performance.start_frame();
 
         let Some(surface_texture) = self.wgpu.surface_texture()? else {
@@ -59,7 +60,8 @@ impl Gfx<'_> {
                 .performance
                 .get_scope("Full Render Frame", &mut encoder);
             self.game.render(&view, scope.recorder);
-            self.egui.render(&self.wgpu, &view, scope.recorder);
+            self.egui
+                .render(&self.wgpu, &view, scope.recorder, build_ui);
         }
 
         self.performance.resolve_queries(&mut encoder);

@@ -4,7 +4,7 @@ use crate::world::World;
 
 pub mod config;
 mod context;
-mod performance;
+pub mod performance;
 mod state;
 mod timer;
 

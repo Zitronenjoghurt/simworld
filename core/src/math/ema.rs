@@ -125,7 +125,7 @@ impl EmaTimer {
     }
 
     pub fn display_average_secs(&self) -> String {
-        format!("{:.02}ms", self.average_secs() * 1000.0)
+        format!("{:.03}ms", self.average_secs() * 1000.0)
     }
 
     pub fn updates_per_sec(&self) -> f32 {
@@ -142,7 +142,7 @@ impl EmaTimer {
     }
 
     pub fn display_budget(&self) -> String {
-        format!("{:.01}%", self.budget() * 100.0)
+        format!("{:.02}%", self.budget() * 100.0)
     }
 }
 
@@ -150,7 +150,7 @@ impl Display for EmaTimer {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "{}/{} ({})",
+            "{} | {} | {}",
             self.display_average_secs(),
             self.display_updates_per_sec(),
             self.display_budget()
