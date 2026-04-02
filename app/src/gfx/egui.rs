@@ -100,6 +100,11 @@ impl Egui {
 
     pub fn set_scale_factor(&mut self, scale_factor: f32) {
         self.state.egui_ctx().set_pixels_per_point(scale_factor);
+        self.screen.pixels_per_point = scale_factor;
+    }
+
+    pub fn get_egui_ctx(&self) -> &egui::Context {
+        self.state.egui_ctx()
     }
 }
 

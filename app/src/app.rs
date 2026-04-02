@@ -1,3 +1,5 @@
+use crate::app::persistence::window::WindowState;
+use crate::app::persistence::AppStateWrite;
 use crate::gfx::Gfx;
 use crate::ui::{AppUi, UiContext};
 use egui_winit::winit::application::ApplicationHandler;
@@ -9,10 +11,14 @@ use simworld_core::sim::Sim;
 use simworld_core::world::World;
 use std::sync::Arc;
 
+mod directories;
+mod persistence;
+
 pub struct App<'a> {
     pub gfx: Option<Gfx<'a>>,
     pub sim: Sim,
     pub ui: AppUi,
+    last_save: std::time::Instant,
 }
 
 impl App<'_> {
@@ -21,15 +27,43 @@ impl App<'_> {
             gfx: None,
             sim: Sim::new(SimConfig::default(), World::new(500, 500)),
             ui: AppUi::default(),
+            last_save: std::time::Instant::now(),
         }
+    }
+
+    pub fn save(&self) {
+        let Some(gfx) = &self.gfx else { return };
+
+        gfx.get_egui_context().memory(|mem| {
+            let window = WindowState::from_window(gfx.window());
+            let state_write = AppStateWrite {
+                app: &self.ui,
+                egui: mem,
+                window,
+            };
+            state_write.save().unwrap();
+        });
     }
 }
 
 impl ApplicationHandler for App<'_> {
     fn resumed(&mut self, event_loop: &ActiveEventLoop) {
-        let window_attrs = Window::default_attributes().with_title("Simworld");
-        let window = Arc::new(event_loop.create_window(window_attrs).unwrap());
-        self.gfx = Some(Gfx::new(window).unwrap());
+        let state = persistence::AppStateRead::load().unwrap();
+
+        let mut attrs = Window::default_attributes().with_title("Simworld");
+        if let Some(state) = &state {
+            attrs = state.window.apply(attrs);
+        }
+
+        let window = Arc::new(event_loop.create_window(attrs).unwrap());
+        let gfx = Gfx::new(window).unwrap();
+
+        if let Some(state) = state {
+            gfx.get_egui_context().memory_mut(|m| *m = state.egui);
+            self.ui = state.app;
+        }
+
+        self.gfx = Some(gfx);
     }
 
     fn window_event(
@@ -42,7 +76,10 @@ impl ApplicationHandler for App<'_> {
         let _consumed = gfx.on_window_event(&event, &mut self.ui.controls);
 
         match event {
-            WindowEvent::CloseRequested => event_loop.exit(),
+            WindowEvent::CloseRequested => {
+                self.save();
+                event_loop.exit();
+            }
             WindowEvent::RedrawRequested => {
                 let sim_state = self.sim.latest_state();
                 gfx.prepare(&sim_state.visuals);
@@ -63,6 +100,11 @@ impl ApplicationHandler for App<'_> {
     fn about_to_wait(&mut self, _event_loop: &ActiveEventLoop) {
         if let Some(gfx) = &mut self.gfx {
             gfx.request_redraw();
+        }
+
+        if self.last_save.elapsed().as_secs() > 10 {
+            self.save();
+            self.last_save = std::time::Instant::now();
         }
     }
 }

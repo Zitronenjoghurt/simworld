@@ -3,6 +3,7 @@ use simworld_core::math::ema::EmaTimer;
 use simworld_core::sim::performance::SimPerformance;
 
 pub mod controls;
+mod windows;
 
 pub struct UiContext<'a> {
     pub gfx_cpu: EmaTimer,
@@ -10,8 +11,9 @@ pub struct UiContext<'a> {
     pub sim_performance: &'a SimPerformance,
 }
 
-#[derive(Default)]
+#[derive(Debug, Default, serde::Serialize, serde::Deserialize)]
 pub struct AppUi {
+    #[serde(skip, default)]
     pub controls: controls::AppUiControls,
 }
 

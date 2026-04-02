@@ -3,7 +3,7 @@ use crate::gfx::game::Game;
 use crate::gfx::performance::GfxPerformance;
 use crate::gfx::wgpu::Wgpu;
 use crate::ui::controls::AppUiControls;
-use ::egui::Ui;
+use ::egui::{Context, Ui};
 use egui_winit::winit;
 use egui_winit::winit::dpi::PhysicalSize;
 use egui_winit::winit::event::MouseScrollDelta;
@@ -123,7 +123,15 @@ impl Gfx<'_> {
         self.egui.set_scale_factor(scale_factor);
     }
 
+    pub fn get_egui_context(&self) -> &Context {
+        self.egui.get_egui_ctx()
+    }
+
     pub fn performance(&self) -> &GfxPerformance {
         &self.performance
+    }
+
+    pub fn window(&self) -> &Window {
+        self.wgpu.window()
     }
 }

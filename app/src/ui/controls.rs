@@ -1,7 +1,7 @@
 use egui_winit::winit::dpi::PhysicalPosition;
 use egui_winit::winit::event::{ElementState, MouseButton};
 
-#[derive(Default)]
+#[derive(Debug, Default, serde::Serialize, serde::Deserialize)]
 pub struct AppUiControls {
     pub mouse_x: f64,
     pub mouse_y: f64,
