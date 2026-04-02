@@ -3,6 +3,7 @@ use egui_winit::winit::application::ApplicationHandler;
 use egui_winit::winit::event::WindowEvent;
 use egui_winit::winit::event_loop::ActiveEventLoop;
 use egui_winit::winit::window::{Window, WindowId};
+use simworld_core::sim::config::SimConfig;
 use simworld_core::sim::Sim;
 use simworld_core::world::World;
 use std::sync::Arc;
@@ -19,7 +20,7 @@ impl App<'_> {
     pub fn new() -> Self {
         Self {
             gfx: None,
-            sim: Sim::new(World::new(500, 500)),
+            sim: Sim::new(SimConfig::default(), World::new(500, 500)),
             controls: controls::AppUiControls::default(),
         }
     }

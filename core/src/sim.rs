@@ -1,9 +1,12 @@
+use crate::sim::config::SimConfig;
 use crate::sim::state::SimState;
 use crate::world::World;
 
+pub mod config;
 mod context;
 mod performance;
 mod state;
+mod timer;
 
 pub struct Sim {
     state_reader: triple_buffer::Output<SimState>,
@@ -11,11 +14,14 @@ pub struct Sim {
 }
 
 impl Sim {
-    pub fn new(world: World) -> Self {
+    pub fn new(config: SimConfig, world: World) -> Self {
         let (sw, sr) = triple_buffer::TripleBuffer::new(&SimState::new()).split();
 
         let ctx = context::SimContext {
             state_writer: sw,
+            config,
+            performance: Default::default(),
+            timer: Default::default(),
             world,
         };
         let _thread = std::thread::spawn(move || ctx.run());
